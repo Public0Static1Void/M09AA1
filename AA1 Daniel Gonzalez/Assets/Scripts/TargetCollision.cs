@@ -4,36 +4,38 @@ using UnityEngine;
 
 public class TargetCollision : MonoBehaviour
 {
-    GameObject ob;
-    private bool collided = true;
-    void Start()
-    {
-        ob = TargetManager.tg.SpawnTarget();
-        ob.transform.SetParent(transform);
-        ob.transform.position = transform.position;
-    }
+    [SerializeField] private GameObject ob_to_spawn;
+    private bool collided = false;
+    [SerializeField] private bool destroy;
+
+    [SerializeField] private int score_gained;
+
     void OnCollisionEnter(Collision other)
     {
         if (other.transform.tag == "Respawn" && !collided)
         {
+            Debug.Log("Colision");
             collided = true;
-            Destroy(ob);
-            GameObject ob2 = TargetManager.tg.SpawnTargetBroken();
-            ob2.transform.SetParent(transform);
-            ob2.transform.position = transform.position;
-            ob = ob2;
-            StartCoroutine(wait_to_destroy());
+            ScoreManager.scoreManager.IncreaseScore(score_gained);
+
+            if (destroy)
+            {
+                GameObject ob = Instantiate(ob_to_spawn);
+                ob.transform.position = transform.position;
+                GetComponent<MeshRenderer>().enabled = false;
+                GetComponent<BoxCollider>().enabled = false;
+
+                StartCoroutine(wait_to_destroy(ob));
+            }
         }
     }
 
-    IEnumerator wait_to_destroy()
+    IEnumerator wait_to_destroy(GameObject ob)
     {
-        yield return new WaitForSeconds(Random.Range(5, 8));
+        yield return new WaitForSeconds(3);
         Destroy(ob);
-        GameObject ob2 = TargetManager.tg.SpawnTarget();
-        ob2.transform.SetParent(transform);
-        ob2.transform.position = transform.position;
-        ob = ob2;
+        GetComponent<MeshRenderer>().enabled = true;
+        GetComponent<BoxCollider>().enabled = true;
         collided = false;
     }
 }
