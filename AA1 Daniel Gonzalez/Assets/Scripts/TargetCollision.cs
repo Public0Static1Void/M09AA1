@@ -15,11 +15,11 @@ public class TargetCollision : MonoBehaviour
         if (other.transform.tag == "Respawn" && !collided)
         {
             Debug.Log("Colision");
-            collided = true;
-            ScoreManager.scoreManager.IncreaseScore(score_gained);
 
             if (destroy)
             {
+                collided = true;
+
                 GameObject ob = Instantiate(ob_to_spawn);
                 ob.transform.position = transform.position;
                 GetComponent<MeshRenderer>().enabled = false;
@@ -27,6 +27,10 @@ public class TargetCollision : MonoBehaviour
 
                 StartCoroutine(wait_to_destroy(ob));
             }
+            else
+                Destroy(other.gameObject);
+
+            ScoreManager.scoreManager.IncreaseScore(score_gained);
         }
     }
 
